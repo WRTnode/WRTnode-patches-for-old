@@ -1,0 +1,78 @@
+--- a/drivers/spi/spi-rt2880.c
++++ b/drivers/spi/spi-rt2880.c
+@@ -27,8 +27,8 @@
+ #include <ralink_regs.h>
+ 
+ #define DRIVER_NAME			"spi-rt2880"
+-/* only one slave is supported*/
+-#define RALINK_NUM_CHIPSELECTS		1
++/* two slave are supported*/
++#define RALINK_NUM_CHIPSELECTS		2
+ /* in usec */
+ #define RALINK_SPI_WAIT_MAX_LOOP	2000
+ 
+@@ -37,6 +37,9 @@
+ #define RAMIPS_SPI_CTL			0x14
+ #define RAMIPS_SPI_DATA			0x20
+ #define RAMIPS_SPI_FIFO_STAT		0x38
++/* SPI_GPIO_MODE */
++#define RAMIPS_SPI_GPIO     0x60
++#define RAMIPS_SPI_ARB      0xf0
+ 
+ /* SPISTAT register bit field */
+ #define SPISTAT_BUSY			BIT(0)
+@@ -92,6 +95,7 @@ struct rt2880_spi {
+ 	unsigned int		speed;
+ 	struct clk		*clk;
+ 	spinlock_t		lock;
++	uint16_t		chipselect;
+ 
+ 	struct rt2880_spi_ops	*ops;
+ };
+@@ -209,6 +213,18 @@ rt2880_spi_setup_transfer(struct spi_dev
+ 
+ static void rt2880_spi_set_cs(struct rt2880_spi *rs, int enable)
+ {
++	int cs = rs->chipselect;
++	u32 val;
++	val = ioread32(rs->base + RAMIPS_SPI_ARB);  //RAMIPS_SPI_ARB  0x00f0
++
++	// swtich between CS0 and CS1
++	if (cs == 0) {
++		val &= ~(1<<16);
++	} else if(cs == 1) {
++		val |= (1<<16);
++	}
++	iowrite32(val,rs->base + RAMIPS_SPI_ARB);
++
+ 	if (enable)
+ 		rt2880_spi_clrbits(rs, RAMIPS_SPI_CTL, SPICTL_SPIENA);
+ 	else
+@@ -436,6 +452,7 @@ static int rt2880_spi_transfer_one_messa
+ 			if (!t->speed_hz && !t->bits_per_word)
+ 				par_override = 0;
+ 		}
++		rs->chipselect = spi->chip_select;
+ 
+ 		if (!cs_active) {
+ 			rs->ops->set_cs(rs, 1);
+@@ -486,10 +503,19 @@ static int rt2880_spi_setup(struct spi_d
+ 
+ static void rt2880_spi_reset(struct rt2880_spi *rs)
+ {
++	 void __iomem *base_gpio;
++	 u32 val_gpio;
++
+ 	rt2880_spi_write(rs, RAMIPS_SPI_CFG,
+ 			 SPICFG_MSBFIRST | SPICFG_TXCLKEDGE_FALLING |
+ 			 SPICFG_SPICLK_DIV16 | SPICFG_SPICLKPOL);
+ 	rt2880_spi_write(rs, RAMIPS_SPI_CTL, SPICTL_HIZSDO | SPICTL_SPIENA);
++
++	// set CS1 pin
++	base_gpio = rs->base - 0xb00;
++	val_gpio = ioread32(base_gpio + RAMIPS_SPI_GPIO);
++	val_gpio &= ~(3 << 11);
++	iowrite32(val_gpio,base_gpio + RAMIPS_SPI_GPIO);
+ }
+ 
+ static void mt7621_spi_reset(struct rt2880_spi *rs)

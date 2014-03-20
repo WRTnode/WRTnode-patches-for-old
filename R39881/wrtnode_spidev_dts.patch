@@ -1,0 +1,18 @@
+--- a/target/linux/ramips/dts/WRTNODE.dts
++++ b/target/linux/ramips/dts/WRTNODE.dts
+@@ -49,6 +49,15 @@
+ 					reg = <0x50000 0xfb0000>;
+ 				};
+ 			};
++			spidev@1 {
++				#address-cells = <1>;
++				#size-cells = <1>;
++				compatible = "spidev";
++				reg = <1 0>;
++				linux,modalias = "spidev", "spidev";
++				spi-max-frequency = <10000000>;
++
++			};
+ 		};
+ 	};
+ 
