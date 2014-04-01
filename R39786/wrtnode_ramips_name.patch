@@ -1,0 +1,11 @@
+--- a/target/linux/ramips/base-files/lib/ramips.sh
++++ b/target/linux/ramips/base-files/lib/ramips.sh
+@@ -280,7 +280,7 @@ ramips_board_detect() {
+ 	*"V22SG")
+ 		name="v22sg"
+ 		;;
+-	*"WRTNODE")
++	*"WRTNode")
+ 		name="wrtnode"
+ 		;;
+ 	*"Sercomm NA930")
