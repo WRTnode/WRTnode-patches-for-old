@@ -1,11 +1,11 @@
---- a/target/linux/ramips/base-files/lib/ramips.sh
-+++ b/target/linux/ramips/base-files/lib/ramips.sh
-@@ -280,7 +280,7 @@ ramips_board_detect() {
- 	*"V22SG")
- 		name="v22sg"
- 		;;
--	*"WRTNODE")
-+	*"WRTNode")
- 		name="wrtnode"
- 		;;
- 	*"Sercomm NA930")
+--- a/target/linux/ramips/dts/WRTNODE.dts	2014-01-13 17:23:13.963259088 +0000
++++ b/target/linux/ramips/dts/WRTNODE.dts	2014-06-27 15:51:35.932726438 +0000
+@@ -4,7 +4,7 @@
+ 
+ / {
+ 	compatible = "wrtnode", "ralink,mt7620n-soc";
+-	model = "WRTNode";
++	model = "WRTNODE";
+ 
+ 	palmbus@10000000 {
+ 		gpio2: gpio@660 {
