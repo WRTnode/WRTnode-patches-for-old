@@ -1,0 +1,36 @@
+--- a/target/linux/ramips/dts/WRTNODE.dts	2014-08-16 16:50:41.774038963 +0000
++++ b/target/linux/ramips/dts/WRTNODE.dts	2014-08-16 15:08:31.990467731 +0000
+@@ -51,6 +51,15 @@
+ 					reg = <0x50000 0xfb0000>;
+ 				};
+ 			};
++			spidev@1 {
++						#address-cells = <1>;
++						#size-cells = <1>;
++						compatible = "spidev";
++						reg = <1 0>;
++						linux,modalias = "spidev", "spidev";
++						spi-max-frequency = <10000000>;
++				
++					 };
+ 		};
+ 	};
+ 
+@@ -70,16 +79,9 @@
+ 	pinctrl {
+ 	 	state_default: pinctrl0 {
+ 			default {
+-				ralink,group = "ephy", "wled", "pa", "i2c", "wdt", "uartf" ,"spi refclk";
++				ralink,group = "ephy", "wled", "pa", "i2c", "wdt", "uartf"; 
+ 				ralink,function = "gpio";
+ 			};
+ 		};
+ 	};
+-	gpio-leds {
+-		compatible = "gpio-leds";
+-		indicator {
+-			label = "wrtnode:blue:indicator";
+-			gpios = <&gpio1 14 1>;
+-		};
+-	};
+ };
