@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>WRTnode mac烧写程序</title>
+</head>
+<body>
+ <script type="text/javascript">
+    function $(str){
+        return document.getElementById(str);
+    }
+	window.onbeforeunload = function(e){
+	if(window.event)
+		window.event.returnValue = "真的要退出吗？确认已记录当前mac地址";
+		alert("关闭浏览器以后本次烧写的mac地址将丢失，请确认已经记录当前mac地址再关闭");
+		return;
+	}
+ </script>
+<H1>WRTnode mac 烧写程序</H1>
+<H2>用如　18:DD:BB:FF:EE:CC 样式输入</H2>
+  <p>
+    <label>将要烧入的mac地址</label>
+    <input type="text" name="1" style="height:45px; font-size:36px;" id="mac" />
+    <script type="text/javascript">
+    var input = $("mac");
+    function filterInput(e){
+		this.value = this.value.replace(/：/g,":").replace(/[^0-9a-fA-F:]/g,"").toUpperCase();
+	}
+	input.onblur = filterInput;
+	</script>
+  </p>
+  <p>提交
+	
+  <button id="btn" style="height:46px; font-size:32px;" >写入上面的mac</button>
+<script type="text/javascript">
+	var count=0;
+	var mac="";
+	
+    function CreateScript(src) {
+
+		var s=document.createElement('script');
+        s.src=src;
+		document.body.appendChild(s);
+		
+		//s.onload=s.onreadystatechange=function(){
+		//	if(!this.readyState||this.readyState=='loaded'||this.readyState=='complete'){
+		//		//s.onload=s.onreadystatechange=null;
+		//		exit();
+		//	}
+		//}
+		s.onerror=function(){
+		alert("板子没有准备好，请检查连线或者稍等\n\n连接到板子的网络不通");
+		$("btn").innerHTML="写入上面的mac"; 
+		$("btn").disabled=false;
+		}
+    }
+
+	
+    function pingback(json) {
+
+		if (json.indexOf("iamreadybabe")<0) {
+			alert("板子没有准备好，请检查连线或者稍等\n\n连接到板子的网络不通");
+			$("btn").innerHTML="写入上面的mac"; 
+			$("btn").disabled=false;
+			return;
+		}
+		
+		CreateScript("http://192.168.8.1/cgi-bin/mmm?sdf=" + mac.replace(/:/g,""));
+	}
+	
+    function mmmback(json) {
+
+		if (json.indexOf("everythingok")<0) {
+			alert("板子没有准备好，请检查连线或者稍等\n\n可以连接到板子，但是板子上有问题");
+			$("btn").innerHTML="写入上面的mac"; 
+			$("btn").disabled=false;
+			return;
+		}
+		
+		if ($("firstmac").innerHTML=="" ) {
+			$("firstmac").innerHTML="第一片起始mac地址为：" + mac + " 。";    	  	
+		}					
+		//加2,准备刷下一台
+		$("last").innerHTML="上一片已写入成功的是  " + mac + "。";
+		var mac0x = parseInt(mac.replace(/:/g,""), 16)+2; 
+		var tmp = mac0x.toString(16);
+		mac = tmp.substr(0,2)+":"+tmp.substr(2,2)+":"+tmp.substr(4,2)+":"+tmp.substr(6,2)+":"+tmp.substr(8,2)+":"+tmp.substr(10,2);
+		mac = mac.toUpperCase();
+		a.value = mac;
+		count+=1;
+		$("count").innerHTML="已刷  " + count + "  片";
+		$("btn").innerHTML="写入上面的mac"; 
+		$("btn").disabled=false;
+				
+	}
+	
+    $("btn").onclick=function(){
+
+		a=$("mac");
+		mac=a.value;
+		
+		if (mac.length!=17) {
+			alert("输入错误，请重试！");
+			a.focus();
+			exit();
+		}
+		
+		var reg_name=/[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}/; 
+		if (!reg_name.test(mac)) {
+			alert("输入错误，请重试！！");
+			a.focus();
+			exit();
+		}
+		var tmp = parseInt(mac.substr(0,2),16);
+		if (tmp%4!=0) {
+			alert("输入的是无效的MAC地址，请检查，重试！");
+			a.focus();
+			exit();
+		}
+		
+		//变灰提交键
+		$("btn").disabled=true; 
+		$("btn").innerHTML="正在写入，请稍等"; 
+		
+		//先验证板子ready否
+		CreateScript("http://192.168.8.1/cgi-bin/ping?sdf=" + mac);
+    }
+</script>
+(按键后将自动加二准备烧写下一块)
+  
+  </p>
+  <label>状态：</label><br><br>
+  <label id="firstmac" style="height:16px; font-size:16px;"></label><br><br>
+  <label id="count" style="height:26px; font-size:22px;"></label><br><br>
+  <label id="last" style="height:26px; font-size:22px;"></label><br><br>
+  <label id="copyright" style="height:12px; font-size:9px;">WRTnode machine team豌豆机器小组，本程序为开源程序，如果使用或分发或改造，请保留本版权信息。</label>
+</body>
+</html>
