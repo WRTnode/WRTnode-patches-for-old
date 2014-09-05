@@ -1,0 +1,30 @@
+--- a/target/linux/ramips/dts/WRTNODE.dts	2014-09-05 10:11:07.146647995 +0000
++++ b/target/linux/ramips/dts/WRTNODE.dts	2014-09-04 18:23:18.570796761 +0000
+@@ -7,6 +7,9 @@
+ 	model = "WRTNODE";
+ 
+ 	palmbus@10000000 {
++		gpio1: gpio@638 {
++			status = "okay";
++		};
+ 		gpio2: gpio@660 {
+ 			status = "okay";
+ 		};
+@@ -67,9 +70,16 @@
+ 	pinctrl {
+ 		state_default: pinctrl0 {
+ 			default {
+-				ralink,group = "ephy", "wled", "pa", "i2c", "wdt", "uartf";
++				ralink,group = "ephy", "wled", "pa", "i2c", "wdt", "uartf" ,"spi refclk";
+ 				ralink,function = "gpio";
+ 			};
+ 		};
+ 	};
++	gpio-leds {
++		compatible = "gpio-leds";
++		indicator {
++			label = "wrtnode:blue:indicator";
++			gpios = <&gpio1 14 1>;
++		};
++	};
+ };
