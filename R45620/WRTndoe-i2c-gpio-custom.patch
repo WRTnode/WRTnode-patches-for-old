@@ -1,0 +1,11 @@
+--- a/package/kernel/i2c-gpio-custom/src/i2c-gpio-custom.c	2014-07-01 11:30:31.149861607 +0000
++++ b/package/kernel/i2c-gpio-custom/src/i2c-gpio-custom.c	2015-07-28 08:15:20.000000000 +0000
+@@ -96,7 +96,7 @@
+ 
+ 	for (i = 0; i < nr_devices; i++)
+ 		if (devices[i])
+-			platform_device_put(devices[i]);
++			platform_device_unregister(devices[i]);
+ }
+ 
+ static int __init i2c_gpio_custom_add_one(unsigned int id, unsigned int *params)
