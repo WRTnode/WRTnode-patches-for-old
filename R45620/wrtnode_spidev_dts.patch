@@ -1,0 +1,35 @@
+--- a/target/linux/ramips/dts/WRTNODE.dts	2015-07-23 14:48:30.402882723 +0000
++++ b/target/linux/ramips/dts/WRTNODE.dts	2015-07-30 11:16:01.873188368 +0000
+@@ -53,6 +53,17 @@
+ 					reg = <0x50000 0xfb0000>;
+ 				};
+ 			};
++
++			spidev@40 {
++						#address-cells = <1>;
++						#size-cells = <1>;
++						compatible = "spidev";
++						reg = <1 0>;
++						linux,modalias = "spidev", "spidev";
++						spi-max-frequency = <10000000>;
++				
++			};
++
+ 		};
+ 	};
+ 
+@@ -82,14 +93,6 @@
+ 		};
+ 	};
+ 
+-	gpio-leds {
+-		compatible = "gpio-leds";
+-		indicator {
+-			label = "wrtnode:blue:indicator";
+-			gpios = <&gpio1 14 0>;
+-		};
+-	};
+-
+ 	gpio-keys-polled {
+ 		compatible = "gpio-keys-polled";
+ 		#address-cells = <1>;

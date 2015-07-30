@@ -1,0 +1,33 @@
+--- a/drivers/spi/spi-rt2880.c	2015-01-26 14:49:36.269930576 +0000
++++ b/drivers/spi/spi-rt2880.c	2015-07-30 10:33:42.193259659 +0000
+@@ -34,6 +34,8 @@
+ 
+ #define RAMIPS_SPI_DEV_OFFSET		0x40
+ 
++#define RAMIPS_SPI_GPIO     0x60
++
+ #define RAMIPS_SPI_STAT(cs)		(0x00 + (cs * RAMIPS_SPI_DEV_OFFSET))
+ #define RAMIPS_SPI_CFG(cs)		(0x10 + (cs * RAMIPS_SPI_DEV_OFFSET))
+ #define RAMIPS_SPI_CTL(cs)		(0x14 + (cs * RAMIPS_SPI_DEV_OFFSET))
+@@ -553,6 +555,8 @@
+ static void rt5350_spi_reset(struct rt2880_spi *rs)
+ {
+ 	int cs;
++	void __iomem *base_gpio;
++	u32 val_gpio;
+ 
+ 	rt2880_spi_write(rs, RAMIPS_SPI_ARBITER,
+ 			 SPICTL_ARB_EN);
+@@ -563,6 +567,12 @@
+ 				 SPICFG_SPICLK_DIV16 | SPICFG_SPICLKPOL);
+ 		rt2880_spi_write(rs, RAMIPS_SPI_CTL(cs), SPICTL_HIZSDO | SPICTL_SPIENA);
+ 	}
++
++	base_gpio = rs->base - 0xb00;
++	val_gpio = ioread32(base_gpio + RAMIPS_SPI_GPIO);
++	val_gpio &= ~(3 << 11);
++	iowrite32(val_gpio,base_gpio + RAMIPS_SPI_GPIO);
++
+ }
+ 
+ static void mt7621_spi_reset(struct rt2880_spi *rs)
